@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cleats &amp; Courts - Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <div class="toast-stack" id="toastStack" aria-live="polite">
+      <div id="formSuccess" class="global-toast global-toast--success is-hidden" role="status">
+        <button type="button" class="global-toast__dismiss" id="dismissSuccess" aria-label="Close">×</button>
+        <p class="global-toast__message" id="formSuccessMessage"></p>
+      </div>
+      <div id="formErrors" class="global-toast global-toast--error is-hidden" role="alert">
+        <div class="global-toast__title">Please correct the following:</div>
+        <ul id="errorList" class="global-toast__list"></ul>
+        <button type="button" class="global-toast__dismiss" id="dismissErrors" aria-label="Dismiss">×</button>
+      </div>
+    </div>
+
+    <iframe
+      name="apps_script_iframe"
+      id="apps_script_iframe"
+      title="Registration submit"
+      class="submit-iframe"
+    ></iframe>
+
+    <div class="container">
+      <div class="top-card">
+        <div class="event-banner">
+          <img src="./assets/logo.png" alt="SparkNext header" />
+        </div>
+        <h1 class="page-title">Cleats &amp; Courts</h1>
+        <div class="event-scroll">
+          <p class="event-intro">
+            Warm greetings from SparkNext Learning Hub! ✨ Cleats &amp; Courts is a dynamic sports
+            showcase designed to foster team bonding, collaboration, networking, and a healthy
+            competitive spirit.
+          </p>
+
+          <div class="event-section">
+            <p>
+              Organized by our student executive interns – fondly known as Sparks – this event
+              features competitive sports for all participants.
+            </p>
+          </div>
+
+          <div class="event-section">
+            <h3 class="event-heading">Featured Sports</h3>
+            <div class="event-station">
+              <strong>⚽ Football (Boys)</strong><br />
+              Team-based competitive football — bring your energy, strategy, and sportsmanship.
+            </div>
+            <div class="event-station">
+              <strong>🏐 Netball (Girls)</strong><br />
+              Fast-paced netball showcasing teamwork, coordination, and competitive spirit.
+            </div>
+          </div>
+
+          <div class="event-section">
+            <p>
+              Football will be conducted for boys and Netball for girls. This structure helps
+              maintain balanced gameplay and allows everyone to fully engage and have fun. We truly
+              appreciate your understanding and enthusiasm!
+            </p>
+          </div>
+
+          <div class="event-section">
+            <h3 class="event-heading">What to bring</h3>
+            <ul class="event-list">
+              <li>A bottle of water</li>
+              <li>Appropriate sports attire</li>
+              <li>An energized mindset, ready to collaborate and compete 🔥</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2 class="section-title">Event Registration</h2>
+
+        <form id="registrationForm" class="registration-form" novalidate>
+          <h3 class="section-title section-title--first">Your information</h3>
+
+          <div class="grid">
+            <div class="field">
+              <label for="fullName">Full name</label>
+              <input id="fullName" type="text" autocomplete="name" placeholder="Enter your name" required />
+            </div>
+
+            <div class="field">
+              <label for="phoneNumber">Phone number</label>
+              <input
+                id="phoneNumber"
+                type="tel"
+                inputmode="tel"
+                autocomplete="tel"
+                placeholder="e.g. 0972141930"
+                required
+              />
+            </div>
+
+            <div class="field full">
+              <label for="email">Email</label>
+              <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+            </div>
+
+            <div class="field">
+              <label for="age">Age (14–23)</label>
+              <input id="age" type="number" min="14" max="23" placeholder="Your age" required />
+            </div>
+
+            <div class="field">
+              <label for="gender">Gender</label>
+              <select id="gender" required>
+                <option value="">Select…</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <h3 class="section-title">How did you hear about this event?</h3>
+          <p class="field-help">
+            If someone personally invited you, choose "Through a person" and add their name.
+          </p>
+          <div class="grid grid--single">
+            <div class="field full">
+              <label for="heardHow">Source</label>
+              <select id="heardHow" name="heardHow" required>
+                <option value="">Select…</option>
+                <option value="Through a person">Through a person</option>
+                <option value="SparkNext Learning Hub Instagram / Website">SparkNext Learning Hub Instagram / Website</option>
+              </select>
+            </div>
+            <div class="field full" id="heardPersonWrap" hidden>
+              <label for="heardPersonName">Name of the person (if applicable)</label>
+              <input
+                id="heardPersonName"
+                type="text"
+                autocomplete="off"
+                placeholder="Who told you about the event?"
+              />
+            </div>
+          </div>
+
+          <h3 class="section-title">Payment</h3>
+          <div class="payment-row">
+            <div class="payment-box">
+              <p class="payment-lead">Secure your spot for just <strong>K100</strong></p>
+              <p class="hint hint--block">
+                Your ticket covers your participation in the event. Send payment
+                to <strong>0777770117 (Ramu Krishnamurthy)</strong>, then upload your confirmation
+                screenshot below (PNG or JPG; large images are resized automatically before send).
+              </p>
+            </div>
+
+            <div class="payment-box">
+              <div class="field">
+                <label for="paymentProof">Payment screenshot</label>
+                <input
+                  id="paymentProof"
+                  class="file-input"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/*"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <section class="terms-section" aria-labelledby="terms-heading">
+            <h3 id="terms-heading" class="section-title">Event terms &amp; consent</h3>
+            <div class="terms-box" tabindex="0">
+              <p>
+                By attending <strong>Cleats &amp; Courts</strong>, you understand that the event may
+                be photographed, filmed, or recorded for documentation, safety, and quality purposes.
+              </p>
+              <p>
+                <strong>Publicity &amp; social media:</strong> SparkNext Learning Hub and approved
+                partners may use photos, video clips, or audio in non-commercial promotional materials
+                (for example social media posts, websites, newsletters, and event highlights) to celebrate
+                learning and showcase the programme. This helps other young people discover similar
+                opportunities.
+              </p>
+              <p>
+                You consent to this use without payment, unless you have contacted the organisers in
+                advance with a written concern. If you do not wish to appear in close-up publicity
+                materials, please email the team before the event so we can note reasonable
+                accommodations where possible.
+              </p>
+              <p>
+                <strong>Physical activity &amp; health:</strong> By registering, you confirm that you
+                are in good health and physically fit to participate in sports activities. You
+                acknowledge that participation involves physical exertion and carries an inherent risk
+                of injury. SparkNext Learning Hub strongly recommends that participants with any
+                pre-existing medical conditions consult a qualified health professional before taking
+                part.
+              </p>
+              <p>
+                <strong>Conduct &amp; fair play:</strong> All participants are expected to demonstrate
+                good sportsmanship, respect for fellow participants, officials, and organisers
+                throughout the event. Any form of aggressive behaviour, harassment, or unsportsmanlike
+                conduct may result in immediate removal from the event without refund.
+              </p>
+              <p>
+                <strong>Liability:</strong> SparkNext Learning Hub and its organisers will not be
+                held liable for any personal injury, loss, or damage to personal property sustained
+                during the event, except where such liability cannot be excluded by law.
+              </p>
+              <p>
+                <strong>Sport assignment:</strong> You acknowledge and accept that Football is
+                designated for boys and Netball for girls. This structure is in place to ensure
+                balanced and fair gameplay for all participants.
+              </p>
+              <p class="terms-note">
+                Your registration details are processed for event administration and follow-up only.
+              </p>
+            </div>
+            <label class="terms-agree">
+              <input id="termsAgree" type="checkbox" required />
+              <span
+                >I have read and agree to these terms, including the physical activity acknowledgement,
+                conduct expectations, sport assignment structure, and photography and possible use of
+                images on social media and other channels.</span
+              >
+            </label>
+          </section>
+
+          <div class="actions">
+            <button id="submitBtn" class="btn" type="submit">Submit registration</button>
+          </div>
+
+          <p class="form-footer">
+            By submitting, your details are captured securely for registration and verification.
+          </p>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
