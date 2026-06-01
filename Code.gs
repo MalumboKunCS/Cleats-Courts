@@ -9,6 +9,8 @@ const HEADERS = [
   "Email",
   "Age",
   "Gender",
+  "Team Registration",
+  "Teammate Names",
   "How heard about event",
   "Referred by (name)",
   "Payment proof file name",
@@ -42,19 +44,20 @@ function doPost(e) {
     const sheet = getOrCreateSheet_();
     ensureHeaders_(sheet);
 
-    const fullName         = clean_(e.parameter.fullName);
-    const phoneNumber      = clean_(e.parameter.phoneNumber);
-    const email            = clean_(e.parameter.email);
-    const age              = clean_(e.parameter.age);
-    const gender           = clean_(e.parameter.gender);
-    const heardHow         = clean_(e.parameter.heardHow);
-    const heardPersonName  = clean_(e.parameter.heardPersonName);
-    const paymentProofName = clean_(e.parameter.paymentProofName);
+    const fullName           = clean_(e.parameter.fullName);
+    const phoneNumber        = clean_(e.parameter.phoneNumber);
+    const email              = clean_(e.parameter.email);
+    const age                = clean_(e.parameter.age);
+    const gender             = clean_(e.parameter.gender);
+    const isTeam             = clean_(e.parameter.isTeam);
+    const teammateNames      = clean_(e.parameter.teammateNames);
+    const heardHow           = clean_(e.parameter.heardHow);
+    const heardPersonName    = clean_(e.parameter.heardPersonName);
+    const paymentProofName   = clean_(e.parameter.paymentProofName);
     const paymentProofBase64 = clean_(e.parameter.paymentProofBase64);
-    const paymentProofMime = clean_(e.parameter.paymentProofMime) || "image/png";
-    const termsAccepted    = clean_(e.parameter.termsAccepted);
+    const paymentProofMime   = clean_(e.parameter.paymentProofMime) || "image/png";
+    const termsAccepted      = clean_(e.parameter.termsAccepted);
 
-    // Validate required fields
     if (!fullName || !phoneNumber || !email || !age || !gender) {
       return json_({ ok: false, message: "Missing required fields." });
     }
@@ -64,20 +67,20 @@ function doPost(e) {
     if (heardHow === "Through a person" && !heardPersonName) {
       return json_({ ok: false, message: "Please enter the name of the person who told you." });
     }
+    if (!isTeam) {
+      return json_({ ok: false, message: "Please indicate whether you are registering as a team." });
+    }
+    if (isTeam === "yes" && !teammateNames) {
+      return json_({ ok: false, message: "Please enter your teammates' names." });
+    }
     if (termsAccepted !== "yes") {
       return json_({ ok: false, message: "Please accept the event terms to continue." });
     }
 
-    // Save payment proof to Drive
     var paymentProofLink = "";
     if (paymentProofBase64 && paymentProofName) {
       try {
-        paymentProofLink = savePaymentProofToDrive_(
-          paymentProofBase64,
-          paymentProofMime,
-          paymentProofName,
-          fullName
-        );
+        paymentProofLink = savePaymentProofToDrive_(paymentProofBase64, paymentProofMime, paymentProofName, fullName);
       } catch (driveErr) {
         Logger.log("Drive upload error: " + driveErr);
         paymentProofLink = "Drive upload failed — " + String(driveErr).slice(0, 120) + " | Registrant: " + email;
@@ -94,6 +97,8 @@ function doPost(e) {
       email,
       age,
       gender,
+      isTeam === "yes" ? "Yes" : "No",
+      isTeam === "yes" ? teammateNames : "",
       heardHow,
       heardHow === "Through a person" ? heardPersonName : "",
       paymentProofName || "(none)",
@@ -136,12 +141,9 @@ function testPaymentProofUploadToDrive() {
 
 function getPaymentProofsTargetFolder_() {
   var folderId = String(PAYMENT_PROOFS_FOLDER_ID || "").trim();
-  // Extract ID if a full URL was pasted
   var m = folderId.match(/\/folders\/([a-zA-Z0-9_-]+)/);
   if (m) folderId = m[1].split(/[?#]/)[0];
-
   if (!folderId) throw new Error("PAYMENT_PROOFS_FOLDER_ID is not set in Code.gs.");
-
   try {
     return DriveApp.getFolderById(folderId);
   } catch (err) {
