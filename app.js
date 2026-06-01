@@ -1,9 +1,7 @@
 // Apps Script Web App URL (Deploy → Web app → copy URL ending in /exec)
 const APPS_SCRIPT_WEB_APP_URL =
-  "https://script.google.com/macros/s/AKfycbzvhyfRU6EKy-kuoW6BYmPTMEu84SCztWJ3rqU6r5dh5ILkzDjQVmhCW51ilrAA4tK_xg/exec";
+  "https://script.google.com/macros/s/AKfycbyamxrgtowHhiGtrdGP_hmU_MP8heU4svbzHA5nd-19GXqoA9hpke4jFHzrEDCw4OKIzQ/exec";
 
-/** After compression, keep uploads small so Apps Script receives the full POST (large base64 was dropping rows). */
-/** Original file from device (we compress before upload). */
 const MAX_PAYMENT_IMAGE_BYTES = 8 * 1024 * 1024;
 const TARGET_MAX_COMPRESSED_BYTES = 450 * 1024;
 const SUCCESS_TOAST_MS = 22000;
@@ -29,13 +27,11 @@ function showErrors(list) {
   const box = $("formErrors");
   const ul = $("errorList");
   ul.innerHTML = "";
-
   list.forEach((msg) => {
     const li = document.createElement("li");
     li.textContent = msg;
     ul.appendChild(li);
   });
-
   box.classList.remove("is-hidden");
   box.classList.add("global-toast--visible");
   $("formSuccess").classList.add("is-hidden");
@@ -60,9 +56,7 @@ function showSuccess(msg) {
   hideErrors();
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (successToastTimer) clearTimeout(successToastTimer);
-  successToastTimer = setTimeout(() => {
-    hideSuccess();
-  }, SUCCESS_TOAST_MS);
+  successToastTimer = setTimeout(() => { hideSuccess(); }, SUCCESS_TOAST_MS);
 }
 
 function hideSuccess() {
@@ -75,54 +69,32 @@ function hideSuccess() {
   }
 }
 
-/**
- * Resize + JPEG compress so the POST payload stays small (Apps Script often truncates huge fields).
- */
 function compressImageFile(file, maxEdge = 1400, quality = 0.82) {
   return new Promise((resolve, reject) => {
-    if (!file.type.startsWith("image/")) {
-      resolve(file);
-      return;
-    }
+    if (!file.type.startsWith("image/")) { resolve(file); return; }
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
       URL.revokeObjectURL(url);
       let w = img.naturalWidth || img.width;
       let h = img.naturalHeight || img.height;
-      if (!w || !h) {
-        reject(new Error("Invalid image"));
-        return;
-      }
+      if (!w || !h) { reject(new Error("Invalid image")); return; }
       if (w > maxEdge || h > maxEdge) {
-        if (w > h) {
-          h = Math.round((h * maxEdge) / w);
-          w = maxEdge;
-        } else {
-          w = Math.round((w * maxEdge) / h);
-          h = maxEdge;
-        }
+        if (w > h) { h = Math.round((h * maxEdge) / w); w = maxEdge; }
+        else { w = Math.round((w * maxEdge) / h); h = maxEdge; }
       }
       const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
+      canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext("2d");
       ctx.fillStyle = "#fff";
       ctx.fillRect(0, 0, w, h);
       ctx.drawImage(img, 0, 0, w, h);
       canvas.toBlob(
-        (blob) => {
-          if (!blob) reject(new Error("Compression failed"));
-          else resolve(blob);
-        },
-        "image/jpeg",
-        quality
+        (blob) => { if (!blob) reject(new Error("Compression failed")); else resolve(blob); },
+        "image/jpeg", quality
       );
     };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Could not load image"));
-    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not load image")); };
     img.src = url;
   });
 }
@@ -160,15 +132,8 @@ function fileToBase64Parts(file) {
   });
 }
 
-/**
- * Posts to Apps Script via HTML form into hidden iframe (avoids fetch/CORS).
- * Includes base64 image so the script can upload to Drive and store a clickable link.
- */
 function submitToAppsScriptWebApp(payload) {
-  if (
-    !APPS_SCRIPT_WEB_APP_URL ||
-    APPS_SCRIPT_WEB_APP_URL === "REPLACE_WITH_YOUR_APPS_SCRIPT_WEB_APP_URL"
-  ) {
+  if (!APPS_SCRIPT_WEB_APP_URL || APPS_SCRIPT_WEB_APP_URL === "REPLACE_WITH_YOUR_APPS_SCRIPT_WEB_APP_URL") {
     throw new Error("Apps Script Web App URL is not set.");
   }
 
@@ -194,6 +159,8 @@ function submitToAppsScriptWebApp(payload) {
   addField("gender", payload.gender);
   addField("heardHow", payload.heardHow);
   addField("heardPersonName", payload.heardPersonName || "");
+  addField("isTeam", payload.isTeam || "");
+  addField("teammateNames", payload.teammateNames || "");
   addField("paymentProofName", payload.paymentProofFile ? payload.paymentProofFile.name : "");
   addField("paymentProofBase64", payload.paymentProofBase64 || "");
   addField("paymentProofMime", payload.paymentProofMime || "");
@@ -204,12 +171,7 @@ function submitToAppsScriptWebApp(payload) {
   setTimeout(() => hiddenForm.remove(), 3000);
 }
 
-function validateForm({
-  paymentProofFile,
-  heardHow,
-  heardPersonName,
-  termsAccepted,
-}) {
+function validateForm({ paymentProofFile, heardHow, heardPersonName, isTeam, teammateNames, termsAccepted }) {
   const errors = [];
 
   const fullName = trimValue($("fullName").value);
@@ -226,8 +188,8 @@ function validateForm({
   if (email && !isEmail(email)) errors.push("Please enter a valid email address.");
   const age = Number(ageStr);
   if (!ageStr || Number.isNaN(age)) errors.push("Please enter your age.");
-  if (!Number.isNaN(age) && (age < 14 || age > 23))
-    errors.push("Age must be between 14 and 23.");
+  if (!Number.isNaN(age) && (age < 13 || age > 24))
+    errors.push("Age must be between 13 and 24.");
   if (!gender) errors.push("Please select your gender.");
 
   if (!heardHow) errors.push("Please tell us how you heard about the event.");
@@ -235,11 +197,14 @@ function validateForm({
     errors.push("Please enter the name of the person who told you about the event.");
   }
 
+  if (!isTeam) errors.push("Please let us know if you are registering as a team.");
+  if (isTeam === "yes" && !trimValue(teammateNames)) {
+    errors.push("Please enter the names of your teammates.");
+  }
+
   if (!paymentProofFile) errors.push("Please upload your payment screenshot.");
   if (paymentProofFile && paymentProofFile.size > MAX_PAYMENT_IMAGE_BYTES) {
-    errors.push(
-      `Payment screenshot must be about ${Math.round(MAX_PAYMENT_IMAGE_BYTES / (1024 * 1024))}MB or less before upload.`
-    );
+    errors.push(`Payment screenshot must be about ${Math.round(MAX_PAYMENT_IMAGE_BYTES / (1024 * 1024))}MB or less before upload.`);
   }
 
   if (!termsAccepted) errors.push("Please read and accept the event terms to continue.");
@@ -264,10 +229,21 @@ function toggleHeardPersonField() {
   if (!isPerson) input.value = "";
 }
 
+function toggleTeammateField() {
+  const isTeam = $("isTeam").value;
+  const wrap = $("teammateWrap");
+  const textarea = $("teammateNames");
+  const isYes = isTeam === "yes";
+  wrap.hidden = !isYes;
+  textarea.required = isYes;
+  if (!isYes) textarea.value = "";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = $("registrationForm");
   const paymentProofInput = $("paymentProof");
   const heardHowSelect = $("heardHow");
+  const isTeamSelect = $("isTeam");
 
   $("dismissSuccess")?.addEventListener("click", hideSuccess);
   $("dismissErrors")?.addEventListener("click", hideErrors);
@@ -275,9 +251,11 @@ document.addEventListener("DOMContentLoaded", () => {
   heardHowSelect.addEventListener("change", toggleHeardPersonField);
   toggleHeardPersonField();
 
+  isTeamSelect.addEventListener("change", toggleTeammateField);
+  toggleTeammateField();
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     hideErrors();
     hideSuccess();
 
@@ -285,13 +263,12 @@ document.addEventListener("DOMContentLoaded", () => {
       paymentProofInput.files && paymentProofInput.files[0] ? paymentProofInput.files[0] : null;
     const heardHow = heardHowSelect.value;
     const heardPersonName = trimValue($("heardPersonName").value);
+    const isTeam = $("isTeam").value;
+    const teammateNames = trimValue($("teammateNames").value);
     const termsAccepted = $("termsAgree").checked;
 
     const { errors, values } = validateForm({
-      paymentProofFile,
-      heardHow,
-      heardPersonName,
-      termsAccepted,
+      paymentProofFile, heardHow, heardPersonName, isTeam, teammateNames, termsAccepted,
     });
 
     if (errors.length) {
@@ -304,7 +281,8 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (first.includes("age")) $("age").focus();
       else if (first.includes("gender")) $("gender").focus();
       else if (first.includes("heard")) $("heardHow").focus();
-      else if (first.includes("person")) $("heardPersonName").focus();
+      else if (first.includes("registering as a team")) $("isTeam").focus();
+      else if (first.includes("teammates")) $("teammateNames").focus();
       else if (first.includes("screenshot")) paymentProofInput.focus();
       else if (first.includes("terms")) $("termsAgree").focus();
       return;
@@ -343,6 +321,8 @@ document.addEventListener("DOMContentLoaded", () => {
       ...values,
       heardHow,
       heardPersonName: heardHow === HEARD_THROUGH_PERSON ? heardPersonName : "",
+      isTeam,
+      teammateNames: isTeam === "yes" ? teammateNames : "",
       paymentProofFile: { name: uploadName },
       paymentProofBase64: proofBase64,
       paymentProofMime: proofMime,
@@ -354,11 +334,10 @@ document.addEventListener("DOMContentLoaded", () => {
       showSuccess(SUCCESS_MESSAGE);
       form.reset();
       toggleHeardPersonField();
+      toggleTeammateField();
     } catch (err) {
       console.error(err);
-      showErrors([
-        "Submission failed. Check your Web App URL in app.js, redeploy Apps Script, and open the Registrations tab.",
-      ]);
+      showErrors(["Submission failed. Check your Web App URL in app.js, redeploy Apps Script, and open the Registrations tab."]);
     } finally {
       setSubmitState({ disabled: false });
     }
