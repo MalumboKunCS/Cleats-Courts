@@ -162,6 +162,11 @@ body {
   display: none !important;
 }
 
+/* Ensure native hidden attribute always works, even when element has explicit display styles */
+[hidden] {
+  display: none !important;
+}
+
 .submit-iframe {
   display: none;
   width: 0;
