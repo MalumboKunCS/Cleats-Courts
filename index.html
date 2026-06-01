@@ -114,8 +114,8 @@
             </div>
 
             <div class="field">
-              <label for="age">Age (14–23)</label>
-              <input id="age" type="number" min="14" max="23" placeholder="Your age" required />
+              <label for="age">Age (13–24)</label>
+              <input id="age" type="number" min="13" max="24" placeholder="Your age" required />
             </div>
 
             <div class="field">
@@ -127,6 +127,30 @@
                 <option value="Prefer not to say">Prefer not to say</option>
                 <option value="Other">Other</option>
               </select>
+            </div>
+          </div>
+
+          <h3 class="section-title">Team registration</h3>
+          <p class="field-help">
+            Teams receive a special concession. If you are registering as a team, select "Yes" and list your teammates' full names below.
+          </p>
+          <div class="grid grid--single">
+            <div class="field full">
+              <label for="isTeam">Are you registering as a team?</label>
+              <select id="isTeam" name="isTeam" required>
+                <option value="">Select…</option>
+                <option value="yes">Yes — we are a team</option>
+                <option value="no">No — I am registering individually</option>
+              </select>
+            </div>
+            <div class="field full" id="teammateWrap" hidden>
+              <label for="teammateNames">Teammates' full names</label>
+              <textarea
+                id="teammateNames"
+                rows="3"
+                placeholder="e.g. John Banda, Mary Phiri, Chanda Mutale"
+              ></textarea>
+              <p class="field-help" style="margin-top:0.35rem;">List each teammate's full name, separated by commas.</p>
             </div>
           </div>
 
@@ -144,7 +168,7 @@
               </select>
             </div>
             <div class="field full" id="heardPersonWrap" hidden>
-              <label for="heardPersonName">Name of the person (if applicable)</label>
+              <label for="heardPersonName">Name of the person</label>
               <input
                 id="heardPersonName"
                 type="text"
@@ -223,6 +247,12 @@
                 designated for boys and Netball for girls. This structure is in place to ensure
                 balanced and fair gameplay for all participants.
               </p>
+              <p>
+                <strong>Team concession:</strong> The team concession applies only to participants
+                who have registered together as a group and listed their teammates at the time of
+                registration. The concession cannot be claimed retrospectively or applied to
+                individual registrations.
+              </p>
               <p class="terms-note">
                 Your registration details are processed for event administration and follow-up only.
               </p>
@@ -231,8 +261,8 @@
               <input id="termsAgree" type="checkbox" required />
               <span
                 >I have read and agree to these terms, including the physical activity acknowledgement,
-                conduct expectations, sport assignment structure, and photography and possible use of
-                images on social media and other channels.</span
+                conduct expectations, sport assignment structure, team concession policy, and photography
+                and possible use of images on social media and other channels.</span
               >
             </label>
           </section>
